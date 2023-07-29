@@ -6,9 +6,9 @@ import shutil
 import tempfile
 import time
 
-import chapter
-from constants import *
-import epub
+from pypub import chapter
+from pypub.constants import *
+from pypub import epub
 
 
 class TestEpub(unittest.TestCase):

@@ -4,7 +4,8 @@ import unittest
 
 from bs4 import BeautifulSoup
 
-from clean import clean, condense, create_html_from_fragment, html_to_xhtml
+from pypub.compat import *
+from pypub.clean import clean, condense, create_html_from_fragment, html_to_xhtml
 
 
 class CleanTests(unittest.TestCase):
