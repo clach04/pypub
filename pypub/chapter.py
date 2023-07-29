@@ -6,7 +6,7 @@ except ImportError:
     # py3
     from html import escape as escape_html
 import codecs
-import imghdr
+import imghdr  # FIXME Deprecated since version 3.11, will be removed in version 3.13:
 import os
 import shutil
 import tempfile
@@ -51,8 +51,19 @@ def get_image_type(url):
         if url.endswith(ending):
             return ending
     else:
+        # Can't infer from URL so pull it down and check/guess
+        # TODO this pulls file down BUT does not persist it so other parts of code will pull down AGAIN
         try:
-            f, temp_file_name = tempfile.mkstemp()
+            # urlretrieve() in py2 will accept '//www.example....', py3 errors as there is no protocol
+            # why use urlretrieve() here?, other code uses requests
+            if url.startswith('//'):
+                """
+                Assume https, ignore http - so far only seen in test suite (which has some old (maybe modified?) pages from wikipedia)
+                for example, '//en.wikipedia.org/wiki/Special:CentralAutoLogin/start?type=1x1'
+                which as of 2023-07-29 returns a 1x1 png
+                """
+                url = 'https:' + url
+            f, temp_file_name = tempfile.mkstemp()  # temp file IO, nasty :-( imghdr only cares about first 32 bytes ... and needs an on disk file :-(
             urlretrieve(url, temp_file_name)
             image_type = imghdr.what(temp_file_name)
             return image_type
@@ -214,6 +225,7 @@ class Chapter(object):
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
         for image_tag, image_url in image_url_list:
+            #print('DEBUG image_url %r' % image_url)  # TODO add real debug logging
             _replace_image(image_url, image_tag, ebook_folder)
         unformatted_html_unicode_string = unicode(self._content_tree.prettify(encoding='utf-8',  # FIXME remove or make a debug option (https://github.com/wcember/pypub/issues/18). From bs4 docs, prettify() is for debugging purposes only - https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing `Since it adds whitespace (in the form of newlines), prettify() changes the meaning of an HTML document and should not be used to reformat one. The goal of prettify() is to help you visually understand the structure of the documents you work with.`
                                                                               formatter=EntitySubstitution.substitute_html),
