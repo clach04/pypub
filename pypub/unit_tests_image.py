@@ -34,7 +34,7 @@ class ChapterTests(unittest.TestCase):
     def test_get_image_urls(self):
         test_url_1 = 'http://example.com'
         test_chapter_1 = chapter.create_chapter_from_url(test_url_1)
-        self.assertEqual(test_chapter_1._get_image_urls(), [])
+        self.assertEqual(test_chapter_1._get_image_urls(), [])  # TODO candidate for update to work with iterator return rather than an list
         test_url_2 = 'http://williamcember.com'
         test_chapter_2 = chapter.create_chapter_from_url(test_url_2)
         test_image_list_2 = self.test_image_list

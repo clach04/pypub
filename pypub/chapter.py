@@ -215,7 +215,7 @@ class Chapter(object):
         raw_image_urls = [node['src'] for node in image_nodes if node.has_attr('src')]
         full_image_urls = [urljoin(self.url, image_url) for image_url in raw_image_urls]
         image_nodes_filtered = [node for node in image_nodes if node.has_attr('src')]
-        return zip(image_nodes_filtered, full_image_urls)
+        return list(zip(image_nodes_filtered, full_image_urls))  # existing callers expecting a list not an iterator
 
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
