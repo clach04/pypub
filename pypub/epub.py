@@ -21,17 +21,19 @@ try:
 except ImportError:
     lxml_module_exists = False
 
-from constants import *
-import chapter
+from .compat import *
+from .constants import *
+from . import chapter
 
 requests.packages.urllib3.disable_warnings()
 
 
 def safe_mkdir(newdir):
+    """Create directory path(s) ignoring "already exists" errors, essentially `mkdir -p`"""
     result_dir = os.path.abspath(newdir)
     try:
         os.makedirs(result_dir)
-    except OSError, info:
+    except OSError as info:
         if info.errno == 17 and os.path.isdir(result_dir):
             pass
         else:
@@ -69,7 +71,7 @@ class _EpubFile(object):
 
     def _render_template(self, **variable_value_pairs):
         def read_template():
-            with open(self.template_file, 'r') as f:
+            with open(self.template_file, 'rb') as f:
                 template = f.read().decode('utf-8')
             return jinja2.Template(template)
         template = read_template()

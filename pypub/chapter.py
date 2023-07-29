@@ -1,11 +1,27 @@
-import cgi
+try:
+    # py2
+    from cgi import escape as escape_html
+except ImportError:
+    # Python 3.8 and later
+    # py3
+    from html import escape as escape_html
 import codecs
 import imghdr
 import os
 import shutil
 import tempfile
-import urllib
-import urlparse
+try:
+    # Py3
+    from urllib.request import urlretrieve
+except ImportError:
+    # Py2
+    from urllib import urlretrieve
+try:
+    # Py3
+    from urllib.parse import urljoin
+except ImportError:
+    # Py2
+    from urllib import urljoin
 import uuid
 
 import bs4
@@ -13,7 +29,8 @@ from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
 import requests
 
-import clean
+from .compat import *
+from . import clean
 
 
 class NoUrlError(Exception):
@@ -36,7 +53,7 @@ def get_image_type(url):
     else:
         try:
             f, temp_file_name = tempfile.mkstemp()
-            urllib.urlretrieve(url, temp_file_name)
+            urlretrieve(url, temp_file_name)
             image_type = imghdr.what(temp_file_name)
             return image_type
         except IOError:
@@ -67,7 +84,7 @@ def save_image(image_url, image_directory, image_name):
         return image_type
 
     try:
-        # urllib.urlretrieve(image_url, full_image_file_name)
+        # urlretrieve(image_url, full_image_file_name)
         with open(full_image_file_name, 'wb') as f:
             user_agent = r'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
             request_headers = {'User-Agent': user_agent}
@@ -143,7 +160,7 @@ class Chapter(object):
         self.content = content
         self._content_tree = BeautifulSoup(self.content, 'html.parser')
         self.url = url
-        self.html_title = cgi.escape(self.title, quote=True)  # FIXME unused
+        self.html_title = escape_html(self.title, quote=True)  # FIXME unused
         # TODO inject title into head of content. Options:
         #   here at init
         #   same time _replace_images_in_chapter() is called
@@ -190,7 +207,7 @@ class Chapter(object):
     def _get_image_urls(self):
         image_nodes = self._content_tree.find_all('img')
         raw_image_urls = [node['src'] for node in image_nodes if node.has_attr('src')]
-        full_image_urls = [urlparse.urljoin(self.url, image_url) for image_url in raw_image_urls]
+        full_image_urls = [urljoin(self.url, image_url) for image_url in raw_image_urls]
         image_nodes_filtered = [node for node in image_nodes if node.has_attr('src')]
         return zip(image_nodes_filtered, full_image_urls)
 

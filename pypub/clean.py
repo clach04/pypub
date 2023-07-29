@@ -5,7 +5,8 @@ import bs4
 from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
 
-import constants
+from .compat import *
+from . import constants
 
 
 def create_html_from_fragment(tag):
@@ -85,7 +86,7 @@ def clean(input_string,
                 parent_node.append(n)
         else:
             attribute_dict = current_node.attrs
-            for attribute in attribute_dict.keys():
+            for attribute in list(attribute_dict.keys()):
                 if attribute not in tag_dictionary[current_node.name]:
                     attribute_dict.pop(attribute)
         stack.extend(child_node_list)
