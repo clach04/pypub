@@ -6,16 +6,8 @@ except ImportError:
     # py3
     from html import escape as escape_html
 import codecs
-import imghdr  # FIXME Deprecated since version 3.11, will be removed in version 3.13:
 import os
 import shutil
-import tempfile
-try:
-    # Py3
-    from urllib.request import urlretrieve
-except ImportError:
-    # Py2
-    from urllib import urlretrieve
 try:
     # Py3
     from urllib.parse import urljoin
@@ -47,7 +39,8 @@ class ImageErrorException(Exception):
 
 
 def get_image_type(url):
-    for ending in ['.jpg', '.jpeg', '.gif', '.png']:
+    supported_image_endings = ['.jpg', '.jpeg', '.gif', '.png']
+    for ending in supported_image_endings:
         if url.endswith(ending):
             return ending
     else:
@@ -55,7 +48,7 @@ def get_image_type(url):
         # TODO this pulls file down BUT does not persist it so other parts of code will pull down AGAIN
         try:
             # urlretrieve() in py2 will accept '//www.example....', py3 errors as there is no protocol
-            # why use urlretrieve() here?, other code uses requests
+            # requests will NOT accept '//' URLs regardless of Python version
             if url.startswith('//'):
                 """
                 Assume https, ignore http - so far only seen in test suite (which has some old (maybe modified?) pages from wikipedia)
@@ -63,9 +56,11 @@ def get_image_type(url):
                 which as of 2023-07-29 returns a 1x1 png
                 """
                 url = 'https:' + url
-            f, temp_file_name = tempfile.mkstemp()  # temp file IO, nasty :-( imghdr only cares about first 32 bytes ... and needs an on disk file :-(
-            urlretrieve(url, temp_file_name)
-            image_type = imghdr.what(temp_file_name)
+            request_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'}
+            requests_object = requests.get(url, headers=request_headers)
+            image_type = '.' + requests_object.headers['content-type'].rsplit('/', 1)[-1]
+            if image_type not in supported_image_endings:
+                image_type = None
             return image_type
         except IOError:
             return None
