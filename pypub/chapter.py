@@ -21,7 +21,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     # Py2
-    from urllib import urljoin
+    from urlparse import urljoin
 import uuid
 
 import bs4

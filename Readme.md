@@ -38,6 +38,18 @@ To use code from a source code checkout from git
 
     $ python -m pip install -r requirements.txt
 
+## Running Tests ##
+
+Issue:
+
+    python -m pypub.unit_tests_chapter
+    python -m pypub.unit_tests_clean
+    python -m pypub.unit_tests_epub
+    python -m pypub.unit_tests_image
+
+There is no way to run all tests (with stdlib).
+
+
 # Useful Resources #
 
   * https://www.eboundcanada.org/resources/whats-in-an-epub-the-opf-file/
