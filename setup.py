@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name='pypub',
-    version='1.5',
+    version='1.6',
     packages=['pypub',],
     package_data={'pypub': ['epub_templates/*',]},
-    author = 'William Cember',
-    author_email = 'wcember@gmail.com',
-    url = 'https://github.com/wcember/pypub',
+    author = 'Chris Clark',
+    author_email = 'clach04@gmail.com',
+    url = 'https://github.com/clach04/pypub',
     license='MIT',
     install_requires=[
             'MarkupSafe==1.1.1',
