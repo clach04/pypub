@@ -95,6 +95,8 @@ def clean(input_string,
         root = create_html_from_fragment(root)
     if title:
         # override
+        if root.html.head is None:
+            root.html.insert(0, root.new_tag('head'))
         if root.html.head.title is None:
             tmp_tag = root.new_tag('title')
             tmp_tag.string = title
