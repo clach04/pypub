@@ -7,7 +7,14 @@ from bs4 import BeautifulSoup
 from pypub.compat import *
 from pypub.clean import clean, condense, create_html_from_fragment, html_to_xhtml
 
-# TODO html and body with out head my_first_chapter = pypub.create_chapter_from_string('<html><body><p>Hello World</p></body></html>', title='Hello Body Chapter')
+"""
+TODO html and body with out head my_first_chapter = pypub.create_chapter_from_string('<html><body><p>Hello World</p></body></html>', title='Hello Body Chapter')
+TODO mdash (etc.) Unicode characters, see:
+ * https://github.com/wcember/pypub/issues/18 - xmlprettify can cause mangled output
+ * https://github.com/wcember/pypub/issues/26 - mdash / ndash not supported
+ * https://github.com/wcember/pypub/issues/20 - Problem with diacritic sign.
+ * epubcheck error FATAL(RSC-016)
+"""
 
 class CleanTests(unittest.TestCase):
     def setUp(self):

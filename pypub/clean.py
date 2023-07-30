@@ -8,6 +8,25 @@ from bs4.dammit import EntitySubstitution
 from .compat import *
 from . import constants
 
+"""
+Debug flag for manually reading idented html/xhtml
+do NOT use as input to real epub consumer software/devices
+See
+ * https://github.com/wcember/pypub/issues/18 - xmlprettify can cause mangled output
+ * https://github.com/wcember/pypub/issues/26 - mdash / ndash not supported
+ * https://github.com/wcember/pypub/issues/20 - Problem with diacritic sign.
+ * epubcheck error FATAL(RSC-016)
+
+From bs4 docs, https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing, prettify() is for debugging purposes only.
+
+> Since it adds whitespace (in the form of newlines), prettify() changes
+> the meaning of an HTML document and should not be used to reformat one.
+> The goal of prettify() is to help you visually understand the structure
+> of the documents you work with.
+
+https://github.com/search?q=repo%3Awcember%2Fpypub%20%20%20prettify&type=code
+"""
+debug_use_pretty = False  # DEBUG this should never be True
 
 def create_html_from_fragment(tag):
     """
@@ -108,9 +127,12 @@ def clean(input_string,
     for node in image_node_list:
         if not node.has_attr('src'):
             node.extract()
-    unformatted_html_unicode_string = unicode(root.prettify(encoding='utf-8',  # FIXME remove or make a debug option (https://github.com/wcember/pypub/issues/18). From bs4 docs, prettify() is for debugging purposes only - https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing `Since it adds whitespace (in the form of newlines), prettify() changes the meaning of an HTML document and should not be used to reformat one. The goal of prettify() is to help you visually understand the structure of the documents you work with.`
-                                                            formatter=EntitySubstitution.substitute_html),
+    if debug_use_pretty:
+        unformatted_html_unicode_string = unicode(root.prettify(encoding='utf-8',  # FIXME remove or make a debug option (https://github.com/wcember/pypub/issues/18). From bs4 docs, prettify() is for debugging purposes only - https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing `Since it adds whitespace (in the form of newlines), prettify() changes the meaning of an HTML document and should not be used to reformat one. The goal of prettify() is to help you visually understand the structure of the documents you work with.`
+                                                                formatter=EntitySubstitution.substitute_html),
                                               encoding='utf-8')
+    else:
+        unformatted_html_unicode_string = unicode(root)
     # fix <br> tags since not handled well by default by bs4
     unformatted_html_unicode_string = unformatted_html_unicode_string.replace('<br>', '<br/>')
     # remove &nbsp; and replace with space since not handled well by certain e-readers
