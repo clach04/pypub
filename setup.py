@@ -1,3 +1,5 @@
+import os
+import sys
 from setuptools import setup
 
 is_py3 = sys.version_info >= (3,)
