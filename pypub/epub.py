@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import time
 import uuid
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 
 import jinja2
 import requests
@@ -294,7 +294,7 @@ class Epub(object):
             if os.path.exists(archname):
                 os.unlink(archname)
             if not flist:
-                flist = ['mimetype']
+                flist = []
                 for path in paths:
                     for root, dirs, files in os.walk(path):
                         for fname in files:
@@ -303,8 +303,11 @@ class Epub(object):
                             fname = os.path.join(root, fname)
                             flist.append(fname)
             os.chdir(save_cwd)
-            arch = ZipFile(archname, 'w')#, ZIP_DEFLATED)  # FIXME
+            compress_type = ZIP_DEFLATED  # regular compression
+            arch = ZipFile(archname, 'w', ZIP_DEFLATED)
             os.chdir(self.EPUB_DIR)
+            fname = os.path.normpath('mimetype')
+            arch.write(fname, compress_type=ZIP_STORED)
             for fname in flist:
                 # . is bad for py24 under win,
                 # py 2.5 generates more sane entries for:
